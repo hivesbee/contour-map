@@ -7,7 +7,8 @@
     </v-toolbar>
     <main>
       <v-container fluid>
-        <router-view></router-view>
+        <gmap-map :center="center" :zoom="7" style="width: 500px; height: 300px">
+        </gmap-map>
       </v-container>
     </main>
     <v-footer class="indigo">
@@ -15,6 +16,12 @@
     </v-footer>
   </v-app>
 </template>
+<!--<template>
+  <div id="app">
+    <gmap-map :center="center" :zoom="7" style="width: 500px; height: 300px">
+    </gmap-map>
+  </div>
+</template>-->
 
 <script>
 export default {
@@ -24,7 +31,13 @@ export default {
       drawer: true,
       drawerRight: true,
       right: null,
-      left: null
+      left: null,
+      center: {lat: 10.0, lng: 10.0},
+      markers: [{
+        position: {lat: 10.0, lng: 10.0}
+      }, {
+        position: {lat: 11.0, lng: 11.0}
+      }]
     }
   }
 }
@@ -32,4 +45,5 @@ export default {
 
 <style lang="stylus">
   @import './main'
+  @import './roboto.css'
 </style>
