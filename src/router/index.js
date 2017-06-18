@@ -1,13 +1,17 @@
 import Vue from 'vue'
-import Vuetify from 'vuetify'
 import Router from 'vue-router'
+import * as VueGoogleMaps from 'vue2-google-maps'
 
 import Main from '@/components/Main'
 import Hello from '@/components/Hello'
-import Map from '@/components/Map'
 
 Vue.use(Router)
-Vue.use(Vuetify)
+Vue.use(VueGoogleMaps, {
+  load: {
+    key: 'AIzaSyBErs3fDyQiX7Lmc4gy1UaLOhW3tU3xyjU',
+    libraries: 'places'
+  }
+})
 
 export default new Router({
   routes: [
@@ -15,11 +19,6 @@ export default new Router({
       path: '/',
       name: 'Main',
       component: Main
-    },
-    {
-      path: '/map/',
-      name: 'Map',
-      component: Map
     },
     {
       path: '/hello/',

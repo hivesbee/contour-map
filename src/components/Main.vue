@@ -1,23 +1,25 @@
 <template>
   <div class="main">
-    <h1>{{ msg }}</h1>
-      <gmap-map :center="center" :zoom="7" style="width: 500px; height: 300px">
-        <!--<gmap-marker v-for="m in markers" :position="m.position" :clickable="true" :draggable="true" @click="center=m.position"></gmap-marker>-->
-      </gmap-map>
+    <v-container fluid>
+      <v-layout row>
+        <v-flex xs4>
+          <v-subheader>中心とする住所</v-subheader>
+        </v-flex>
+        <v-flex xs4>
+          <v-text-field name="input-1" label="中心とする住所" id="testing"></v-text-field>
+        </v-flex xs4>
+        <v-flex xs4>
+          <v-btn primary light>検索</v-btn>
+        </v-flex xs4>
+      </v-layout>
+      <v-layout>
+        <gmap-map :center="center" :zoom="7" class="map-container"></gmap-map>
+      </v-layout>
+    </v-container>
   </div>
 </template>
 
 <script>
-import Vue from 'vue'
-import * as VueGoogleMaps from 'vue2-google-maps'
-
-Vue.use(VueGoogleMaps, {
-  load: {
-    key: 'AIzaSyBErs3fDyQiX7Lmc4gy1UaLOhW3tU3xyjU',
-    v: '3.24',
-    libraries: 'places'
-  }
-})
 
 export default {
   name: 'main',
@@ -54,4 +56,9 @@ li {
 a {
   color: #42b983;
 }
+
+.map-container {
+    width: 500px;
+    height: 300px;
+  }
 </style>
