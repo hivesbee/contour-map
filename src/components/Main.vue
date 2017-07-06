@@ -1,37 +1,151 @@
 <template>
   <div class="main">
     <v-container fluid>
-      <v-layout row>
-        <v-flex xs4>
-          <v-subheader>中心とする住所</v-subheader>
+      <v-layout  row wrap>
+        <v-flex xs12>
+          <gmap-map ref="map" :center="center" :zoom="zoom" @center_changed="updateCenter" class="map-container">
+            <gmap-marker v-for="m in markers" :key="m.position" :position="m.position" :clickable="true" :draggable="true" @click="center=m.position"></gmap-marker>
+            <gmap-circle v-for="c in circles" :key="c.position" :center="c.position" :radius="c.radius" :options="c.options"></gmap-circle>
+          </gmap-map>
         </v-flex>
-        <v-flex xs4>
-          <v-text-field name="input-1" label="中心とする住所" id="testing"></v-text-field>
-        </v-flex xs4>
-        <v-flex xs4>
-          <v-btn primary light>検索</v-btn>
-        </v-flex xs4>
       </v-layout>
-      <v-layout>
-        <gmap-map :center="center" :zoom="7" class="map-container"></gmap-map>
+      <v-layout row wrap>
+        <v-flex xs12>
+          <v-card class="grey lighten-4 elevation-0 ma-1">
+            <v-card-actions>
+              <v-container fluid>
+                <v-layout row wrap>
+                  <v-flex xs5 sm10>
+                    <v-text-field label="中心とする住所" id="testing" v-model="center_address"></v-text-field>
+                  </v-flex>
+                  <v-flex xs2 sm2>
+                    <v-btn primary light @click.native="search">
+                      <v-icon light left>search</v-icon>検索
+                    </v-btn>
+                  </v-flex>
+                  <v-flex xs2 sm6>
+                    <v-select
+                      v-bind:items="range"
+                      v-model="selectedRange"
+                      label="表示範囲 (m)"
+                      class="input-group"
+                      item-value="number"
+                      input="changeViewCircle"
+                    ></v-select>
+                  </v-flex>
+                  <v-flex xs2 sm6>
+                    <v-select
+                      v-bind:items="interval"
+                      v-model="selectedInterval"
+                      label="間隔 (m)"
+                      class="input-group"
+                      item-value="number"
+                    ></v-select>
+                  </v-flex>
+                </v-layout>
+              </v-container>
+            </v-card-actions>
+          </v-card>
+        </v-flex>
       </v-layout>
     </v-container>
   </div>
 </template>
 
 <script>
+import Vue from 'vue'
+import * as VueGoogleMaps from 'vue2-google-maps'
+
+Vue.use(VueGoogleMaps, {
+  load: {
+    key: 'AIzaSyBErs3fDyQiX7Lmc4gy1UaLOhW3tU3xyjU',
+    libraries: ['places', 'geocoder']
+  }
+})
 
 export default {
   name: 'main',
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',
+      center_address: '黒崎ビル',
       center: {lat: 10.0, lng: 10.0},
       markers: [{
         position: {lat: 10.0, lng: 10.0}
       }, {
         position: {lat: 11.0, lng: 11.0}
-      }]
+      }],
+      zoom: 7,
+      circles: [],
+      range: [
+        500, 1000, 2000, 3000
+      ],
+      interval: [
+        100, 200, 300, 500, 1000
+      ],
+      selectedRange: 500,
+      selectedInterval: 100
+    }
+  },
+  created () {
+  },
+  watch: {
+    selectedRange: function (newRange) {
+      this.changeViewCircle()
+    },
+    selectedInterval: function (newInterval) {
+      this.changeViewCircle()
+    }
+  },
+  methods: {
+    search: function (place) {
+      let self = this
+      let geocoder = new window.google.maps.Geocoder()
+      geocoder.geocode({
+        'address': self.center_address,
+        'region': 'jp'
+      }, function (results, status) {
+        console.log(results[0].geometry.location.lat() + ', ' + results[0].geometry.location.lng())
+        self.center = {
+          lat: results[0].geometry.location.lat(),
+          lng: results[0].geometry.location.lng()
+        }
+        self.markers.push({position: {
+          lat: results[0].geometry.location.lat(),
+          lng: results[0].geometry.location.lng()
+        }})
+        self.zoom = 15
+        self.changeViewCircle()
+      })
+    },
+    updateCenter: function (center) {
+      console.log('updateCenter')
+      this.zoom = 15
+      this.circles[0].position = this.center
+      this.circles[1].position = this.center
+    },
+    changeViewCircle: function () {
+      this.circles = []
+      for (let i = this.selectedInterval; i < this.selectedRange; i += this.selectedInterval) {
+        this.circles.push({
+          position: this.center,
+          radius: i,
+          options: {
+            fillOpacity: 0.0,
+            strokeWeight: 3,
+            strokeColor: '#42a5f5'
+          }
+        })
+      }
+      this.circles.push({
+        position: this.center,
+        radius: this.selectedRange,
+        options: {
+          fillOpacity: 0.0,
+          strokeWeight: 4,
+          strokeColor: '#1E88E6'
+        }
+      })
     }
   }
 }
@@ -58,7 +172,7 @@ a {
 }
 
 .map-container {
-    width: 500px;
-    height: 300px;
-  }
+  width: 100%;
+  height: 300px;
+}
 </style>
