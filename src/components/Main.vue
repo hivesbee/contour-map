@@ -56,10 +56,11 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import * as VueGoogleMaps from 'vue2-google-maps'
+import config from 'config'
 
 Vue.use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyBErs3fDyQiX7Lmc4gy1UaLOhW3tU3xyjU',
+    key: config.googleMapKey,
     libraries: ['places', 'geocoder'],
     options: {
     }
