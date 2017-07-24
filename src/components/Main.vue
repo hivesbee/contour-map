@@ -4,8 +4,8 @@
       <v-layout  row wrap>
         <v-flex xs12>
           <gmap-map ref="map" :center="center" :zoom="zoom" @center_changed="updateCenter" class="map-container">
-            <gmap-marker v-for="m in markers" :key="m.position" :position="m.position" :clickable="true" :draggable="true" @click="center=m.position"></gmap-marker>
-            <gmap-circle v-for="c in circles" :key="c.position" :center="c.position" :radius="c.radius" :options="c.options"></gmap-circle>
+            <gmap-marker v-for="m in markers" :key="JSON.stringify(m.position)" :position="m.position" :clickable="m.options.clickable" :draggable="m.options.draggable" @click="center=m.position"></gmap-marker>
+            <gmap-circle v-for="c in circles" :key="JSON.stringify(c.position)" :center="c.position" :radius="c.radius" :options="c.options"></gmap-circle>
           </gmap-map>
         </v-flex>
       </v-layout>
@@ -54,27 +54,30 @@
 
 <script>
 import Vue from 'vue'
+import Vuetify from 'vuetify'
 import * as VueGoogleMaps from 'vue2-google-maps'
 
 Vue.use(VueGoogleMaps, {
   load: {
     key: 'AIzaSyBErs3fDyQiX7Lmc4gy1UaLOhW3tU3xyjU',
-    libraries: ['places', 'geocoder']
+    libraries: ['places', 'geocoder'],
+    options: {
+    }
   }
 })
+Vue.use(Vuetify)
 
 export default {
   name: 'main',
+  components: {
+    // vCard, vCardAction
+  },
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',
-      center_address: '黒崎ビル',
-      center: {lat: 10.0, lng: 10.0},
-      markers: [{
-        position: {lat: 10.0, lng: 10.0}
-      }, {
-        position: {lat: 11.0, lng: 11.0}
-      }],
+      center_address: '',
+      center: {lat: 35.6811673, lng: 139.76705160000006},
+      markers: [],
       zoom: 7,
       circles: [],
       range: [
@@ -86,8 +89,6 @@ export default {
       selectedRange: 500,
       selectedInterval: 100
     }
-  },
-  created () {
   },
   watch: {
     selectedRange: function (newRange) {
@@ -110,12 +111,19 @@ export default {
           lat: results[0].geometry.location.lat(),
           lng: results[0].geometry.location.lng()
         }
-        self.markers.push({position: {
-          lat: results[0].geometry.location.lat(),
-          lng: results[0].geometry.location.lng()
-        }})
+        self.markers.push({
+          position: {
+            lat: results[0].geometry.location.lat(),
+            lng: results[0].geometry.location.lng()
+          },
+          options: {
+            clickable: false,
+            draggable: false
+          }
+        })
         self.zoom = 15
         self.changeViewCircle()
+        console.log(self.center)
       })
     },
     updateCenter: function (center) {
@@ -173,6 +181,6 @@ a {
 
 .map-container {
   width: 100%;
-  height: 300px;
+  height: 400px;
 }
 </style>
